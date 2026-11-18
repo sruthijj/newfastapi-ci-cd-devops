@@ -82,6 +82,7 @@ pipeline {
                             else
                                 git -c user.name="Jenkins CI" -c user.email="jenkins@ci.local" \
                                     commit -am "chore(manifest): update fastapi image tag to ${BUILD_NUMBER} [skip ci]"
+                                git pull --rebase "https://${GIT_USER}:${GIT_PASS}@${MANIFEST_REPO#https://}" "${MANIFEST_BRANCH}"
                                 git push "https://${GIT_USER}:${GIT_PASS}@${MANIFEST_REPO#https://}" "HEAD:${MANIFEST_BRANCH}"
                             fi
                         '''
