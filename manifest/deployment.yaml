@@ -1,16 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: maker-deployment
+  name: fastapi-deployment
   namespace: production
   labels:
-    app: maker
-    tier: frontend
+    app: fastapi
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: maker
+      app: fastapi
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -19,11 +18,10 @@ spec:
   template:
     metadata:
       labels:
-        app: maker
-        tier: frontend
+        app: fastapi
     spec:
       containers:
-        - name: maker
+        - name: fastapi
           image: IMAGE_PLACEHOLDER          # replaced by Jenkinsfile at deploy time
           imagePullPolicy: Always
           ports:

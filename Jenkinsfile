@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         DOCKER_CREDENTIALS_ID = 'docker-cred'
-        DOCKER_IMAGE          = 'sruthijj/maker'
+        DOCKER_IMAGE          = 'sruthijj/fastapi'
         SONAR_SERVER_NAME     = 'Sonarqube_env'
         SONAR_SCANNER_TOOL    = 'sonar-scanner'
         GIT_CREDENTIALS_ID    = 'github-cred'
@@ -31,9 +31,10 @@ pipeline {
                     withSonarQubeEnv("${SONAR_SERVER_NAME}") {
                         sh "${scannerHome}/bin/sonar-scanner \
                             -Dsonar.host.url=http://localhost:9000 \
-                            -Dsonar.projectKey=maker-key \
-                            -Dsonar.projectName='maker-project' \
-                            -Dsonar.sources=${sourcesDir}"
+                            -Dsonar.projectKey=fastapi-key \
+                            -Dsonar.projectName='fastapi-project' \
+                            -Dsonar.sources=${sourcesDir} \
+                            -Dsonar.coverage.exclusions=**/*"
                     }
                 }
             }
@@ -80,7 +81,7 @@ pipeline {
                                 echo "No manifest changes to commit."
                             else
                                 git -c user.name="Jenkins CI" -c user.email="jenkins@ci.local" \
-                                    commit -am "chore(manifest): update maker image tag to ${BUILD_NUMBER} [skip ci]"
+                                    commit -am "chore(manifest): update fastapi image tag to ${BUILD_NUMBER} [skip ci]"
                                 git push "https://${GIT_USER}:${GIT_PASS}@${MANIFEST_REPO#https://}" "HEAD:${MANIFEST_BRANCH}"
                             fi
                         '''
