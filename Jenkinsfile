@@ -7,13 +7,13 @@ pipeline {
 
     environment {
         DOCKER_CREDENTIALS_ID = 'docker-cred'
-        DOCKER_IMAGE          = 'sruthijj/fastapi-app'
+        DOCKER_IMAGE          = 'sruthijj/maker'
         SONAR_SERVER_NAME     = 'Sonarqube_env'
         SONAR_SCANNER_TOOL    = 'sonar-scanner'
         GIT_CREDENTIALS_ID    = 'github-cred'
-        MANIFEST_REPO         = 'https://github.com/sruthijj/maker.git'
+        MANIFEST_REPO         = 'https://github.com/sruthijj/newfastapi-ci-cd-devops'
         MANIFEST_BRANCH       = 'main'
-        MANIFEST_FILE         = 'manifests/deployment.yaml'
+        MANIFEST_FILE         = 'manifest/deployment.yaml'
     }
 
     stages {
@@ -31,8 +31,8 @@ pipeline {
                     withSonarQubeEnv("${SONAR_SERVER_NAME}") {
                         sh "${scannerHome}/bin/sonar-scanner \
                             -Dsonar.host.url=http://localhost:9000 \
-                            -Dsonar.projectKey=fastapi-key \
-                            -Dsonar.projectName='fastapi-project' \
+                            -Dsonar.projectKey=maker-key \
+                            -Dsonar.projectName='maker-project' \
                             -Dsonar.sources=${sourcesDir}"
                     }
                 }
@@ -73,14 +73,14 @@ pipeline {
                                 exit 1
                             fi
 
-                            # Replace the image line for this app, keeping its indentation
-                            sed -i "s|image:.*${DOCKER_IMAGE}.*|image: ${DOCKER_IMAGE}:${BUILD_NUMBER}|" "$MANIFEST_FILE"
+                            # Replace image line (matches IMAGE_PLACEHOLDER or existing image tag), keeping indentation
+                            sed -i -E "s|(^[[:space:]]*image:).*|\\1 ${DOCKER_IMAGE}:${BUILD_NUMBER}|" "$MANIFEST_FILE"
 
                             if git diff --quiet; then
                                 echo "No manifest changes to commit."
                             else
                                 git -c user.name="Jenkins CI" -c user.email="jenkins@ci.local" \
-                                    commit -am "chore(manifest): update fastapi-app image tag to ${BUILD_NUMBER} [skip ci]"
+                                    commit -am "chore(manifest): update maker image tag to ${BUILD_NUMBER} [skip ci]"
                                 git push "https://${GIT_USER}:${GIT_PASS}@${MANIFEST_REPO#https://}" "HEAD:${MANIFEST_BRANCH}"
                             fi
                         '''
